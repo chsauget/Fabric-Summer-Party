@@ -46,9 +46,7 @@ BEGIN
         ,[EstSupprime] = c.[Deleted]
     FROM [AmazingZoneLH].[dbo].[dbo_Customer] c --> Lakehouse
 END
-```
 
-```sql
 CREATE OR ALTER PROCEDURE [dwh].[PsDimDate] 
     @PremiereDate DATE = '2022-01-01',
     @DerniereDate DATE
@@ -102,9 +100,7 @@ BEGIN
         SET @IterateurDate = DATEADD(DAY, 1, @IterateurDate);
     END;
 END;
-```
 
-```sql
 
 CREATE OR ALTER PROCEDURE [dwh].[PsDimProduit]
 AS
@@ -132,9 +128,7 @@ BEGIN
         [Prix] = p.[Price]
     FROM [AmazingZoneLH].[dbo].[dbo_Product] p
 END
-```
 
-```sql
 CREATE OR ALTER   PROCEDURE [dwh].[PsFaitCommande]
 AS
 BEGIN
