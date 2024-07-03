@@ -1,6 +1,6 @@
 # Fabric-Summer-Party
 
-## Lab 2 ##
+## Lab 2 - Transformation et modélisation ##
 ### Vue Fait Budget ###
 ```sql
 SELECT      [Country]
@@ -159,5 +159,6 @@ BEGIN
     INNER JOIN [dwh].[DimProduit] pdt ON ordit.[ProductId] = pdt.[ProduitId]
 END
 ```
-
+## Lab 4 - Data Science ##
+[fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
 
