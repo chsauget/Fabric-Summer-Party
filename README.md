@@ -161,7 +161,18 @@ CREATE VIEW [dwh].[DimProduit_nbk] AS (SELECT [Id],
         [Prix] = p.[Price]
 FROM [AmazingZoneLH].[dbo].[dimProduit_nbk] p)
 ```
-
+### Dates ###
+```sql
+SELECT [Dates]
+            ,[Year]
+            ,[Month]
+            ,[MonthName]
+            ,[ShortMonthName]
+            ,[Quarter]
+            ,[QtrText]
+            ,[DateId]
+FROM [AmazingZoneLH].[dbo].[Calendrier]
+```
 
 ## Lab 4 - Data Science ##
 [fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
