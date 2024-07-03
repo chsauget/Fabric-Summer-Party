@@ -186,6 +186,10 @@ CA LY = CALCULATE(
 
 Quantité Totale = SUM(FaitCommande[Quantité])
 ```
+
+## Lab 3 Visualisation & Copilot ##
+![image](./Fab summer party background.png)
+
 ## Lab 4 - Data Science ##
 [fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
 
