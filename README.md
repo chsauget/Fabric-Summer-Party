@@ -1,13 +1,45 @@
 # Fabric-Summer-Party
 
 ## Lab 2 - Transformation et modélisation ##
-### Vue Fait Budget ###
+
+### Création des tables DimClient et  DimProduit###
 ```sql
-SELECT      [Country]
-            ,[Period]
-            ,[BudgetAmount]
-FROM [AmazingZoneLH].[dbo].[ExcelBudget]
+ DROP TABLE IF EXISTS [dwh].[DimClient];
+
+CREATE TABLE [dwh].[DimClient]
+(
+	[ClientId] [int]  NULL,
+	[ClientSourceId] [int]  NULL,
+	[Identifiant] [varchar](8000)  NULL,
+	[Email] [varchar](8000)  NULL,
+	[Prenom] [varchar](8000)  NULL,
+	[Nom] [varchar](8000)  NULL,
+	[Entreprise] [varchar](8000)  NOT NULL,
+	[CodePostal] [varchar](8000)  NULL,
+	[Ville] [varchar](8000)  NULL,
+	[Pays] [varchar](8000)  NULL,
+	[EstActif] [bit]  NULL,
+	[EstSupprime] [bit]  NULL
+)
+GO; 
+
+ DROP TABLE IF EXISTS [dwh].[DimProduit];
+
+CREATE TABLE [dwh].[DimProduit]
+(
+	[ProduitId] [int]  NULL,
+	[Nom] [varchar](8000)  NULL,
+	[Référence] [varchar](8000)  NULL,
+	[Description] [varchar](8000)  NULL,
+	[Description Complète] [varchar](8000)  NULL,
+	[Exonéré de Taxes] [bit]  NULL,
+	[Quantité en Stock] [int]  NULL,
+	[Prix] [decimal](18,4)  NULL
+)
+GO
 ```
+
+
 ### Procédure Entrepot ###
 
 ```sql
@@ -46,61 +78,6 @@ BEGIN
         ,[EstSupprime] = c.[Deleted]
     FROM [AmazingZoneLH].[dbo].[dbo_Customer] c --> Lakehouse
 END;
-GO
-CREATE OR ALTER PROCEDURE [dwh].[PsDimDate] 
-    @PremiereDate DATE = '2022-01-01',
-    @DerniereDate DATE
-AS
-BEGIN
- DROP TABLE IF EXISTS [dwh].[PsDimDate]
-    DECLARE @IterateurDate DATE = @PremiereDate;
-
-    WHILE @IterateurDate <= @DerniereDate
-    BEGIN
-        INSERT INTO [dwh].[DimDate] (
-            [DateId]
-            ,[Date]
-            ,[Annee]
-            ,[CodeAnneeMois]
-            ,[CodeMois]
-            ,[MoisCourt]
-            ,[MoisLong]
-            ,[Trimestre]
-            ,[CodeTrimestre]
-            ,[CodeAnneeTrimestre]
-            ,[Semaine]
-            ,[CodeSemaine]
-            ,[CodeAnneeSemaine]
-            ,[JourSemaine]
-            ,[Jour]
-            ,[JourCourt] 
-            ,[JourLong]
-        )
-        --DECLARE @IterateurDate DATE = '2023-09-01';
-        SELECT
-            [DateId] = CONVERT(VARCHAR(8), @IterateurDate, 112)
-            ,[Date] = CAST(@IterateurDate AS DATE)
-            ,[Annee] = DATEPART(YEAR, @IterateurDate)
-            ,[CodeAnneeMois] = FORMAT(@IterateurDate, 'yyyy-MM')
-            ,[CodeMois] = FORMAT(@IterateurDate, 'MM')
-            ,[MoisCourt] = FORMAT(@IterateurDate, 'MMM', 'fr-fr')
-            ,[MoisLong] = FORMAT(@IterateurDate, 'MMMM', 'fr-fr')
-            ,[Trimestre] = DATEPART(QQ, @IterateurDate)
-            ,[CodeTrimestre] = CONCAT('Q', DATEPART(QQ, @IterateurDate))
-            ,[CodeAnneeTrimestre] = CONCAT(DATEPART(YEAR, @IterateurDate), '-Q', DATEPART(QQ, @IterateurDate))
-            ,[Semaine] = DATEPART(WK, @IterateurDate)
-            ,[CodeSemaine] = CONCAT('S', DATEPART(WK, @IterateurDate))
-            ,[CodeAnneeSemaine] = CONCAT(DATEPART(YEAR, @IterateurDate), '-S', DATEPART(WK, @IterateurDate))
-            ,[JourSemaine] = DATEPART(DW, @IterateurDate)
-            ,[Jour] = DATEPART(DD, @IterateurDate)
-            ,[JourCourt] = FORMAT(@IterateurDate, 'ddd', 'fr-fr')
-            ,[JourLong] = FORMAT(@IterateurDate, 'dddd', 'fr-fr')
-        WHERE NOT EXISTS (SELECT 1 FROM [dwh].[DimDate] WHERE [Date] = @IterateurDate)
-            
-        SET @IterateurDate = DATEADD(DAY, 1, @IterateurDate);
-    END;
-END;
-
 GO
 CREATE OR ALTER PROCEDURE [dwh].[PsDimProduit]
 AS
@@ -159,6 +136,35 @@ BEGIN
     INNER JOIN [dwh].[DimProduit] pdt ON ordit.[ProductId] = pdt.[ProduitId]
 END;
 ```
+### Vue Fait Budget ###
+```sql
+SELECT      [Country]
+            ,[Period]
+            ,[BudgetAmount]
+FROM [AmazingZoneLH].[dbo].[ExcelBudget]
+```
+
+### Notebook Dim Produit ###
+
+[CreateDimProduit.ipynb](./CreateDimProduit.ipynb)
+
+### Create view DimProduitNBK ###
+```sql
+CREATE VIEW [dwh].[DimProduit_nbk] AS (SELECT [Id],
+        [ProduitId] = p.[Id],
+        [Nom] = p.[Name],
+        [Référence] = p.[Sku],
+        [Description] = p.[ShortDescription],
+        [Description Complète] = p.[FullDescription],
+        [Exonéré de Taxes] = p.[IsTaxExempt],
+        [Quantité en Stock] = p.[StockQuantity],
+        [Prix] = p.[Price]
+FROM [AmazingZoneLH].[dbo].[dimProduit_nbk] p)
+```
+
+
+
+
 ## Lab 4 - Data Science ##
 [fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
 
