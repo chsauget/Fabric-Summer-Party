@@ -2,7 +2,7 @@
 
 ## Lab 2 - Transformation et modélisation ##
 
-### Création des tables DimClient et  DimProduit###
+### Création des tables DimClient et  DimProduit ###
 ```sql
  DROP TABLE IF EXISTS [dwh].[DimClient];
 
@@ -161,8 +161,6 @@ CREATE VIEW [dwh].[DimProduit_nbk] AS (SELECT [Id],
         [Prix] = p.[Price]
 FROM [AmazingZoneLH].[dbo].[dimProduit_nbk] p)
 ```
-
-
 
 
 ## Lab 4 - Data Science ##
