@@ -45,8 +45,8 @@ BEGIN
         ,[EstActif] = c.[Active]
         ,[EstSupprime] = c.[Deleted]
     FROM [AmazingZoneLH].[dbo].[dbo_Customer] c --> Lakehouse
-END
-
+END;
+GO
 CREATE OR ALTER PROCEDURE [dwh].[PsDimDate] 
     @PremiereDate DATE = '2022-01-01',
     @DerniereDate DATE
@@ -101,7 +101,7 @@ BEGIN
     END;
 END;
 
-
+GO
 CREATE OR ALTER PROCEDURE [dwh].[PsDimProduit]
 AS
 BEGIN
@@ -127,8 +127,8 @@ BEGIN
         [Quantité en Stock] = p.[StockQuantity],
         [Prix] = p.[Price]
     FROM [AmazingZoneLH].[dbo].[dbo_Product] p
-END
-
+END;
+GO
 CREATE OR ALTER   PROCEDURE [dwh].[PsFaitCommande]
 AS
 BEGIN
@@ -157,7 +157,7 @@ BEGIN
     LEFT JOIN [AmazingZoneLH].[dbo].[dbo_Order] ord ON ord.[Id] = ordit.[OrderId] 
     INNER JOIN [dwh].[DimClient] cli ON ord.[CustomerId] = cli.[ClientSourceId]
     INNER JOIN [dwh].[DimProduit] pdt ON ordit.[ProductId] = pdt.[ProduitId]
-END
+END;
 ```
 ## Lab 4 - Data Science ##
 [fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
