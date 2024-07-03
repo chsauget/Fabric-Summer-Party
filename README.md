@@ -173,7 +173,19 @@ SELECT [Dates]
             ,[DateId]
 FROM [AmazingZoneLH].[dbo].[Calendrier]
 ```
+### Mesures ###
+```sql
+CA = SUMX(FaitCommande
+	, FaitCommande[Quantité] * FaitCommande[PrixUnitaireTTC]
+)
 
+CA LY = CALCULATE(
+    [CA],
+    SAMEPERIODLASTYEAR(DimDate[Dates]
+)
+
+Quantité Totale = SUM(FaitCommande[Quantité])
+```
 ## Lab 4 - Data Science ##
 [fraud_detection_clean.ipynb](./fraud_detection_clean.ipynb)
 
