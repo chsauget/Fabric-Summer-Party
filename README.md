@@ -242,7 +242,24 @@ CA LY = CALCULATE(
 
 Quantité Totale = SUM(FaitCommande[Quantité])
 ```
-
+## Lab Temps réel ##
+```
+.create function 
+with (docstring = 'SummerLove', folder='Views')
+LogsView(){
+Logs
+| mv-expand records
+| extend dateLog = records.['time']
+        , Type = records.['Type']
+        , Success = records.['Success']
+        , ResultCode = records.['ResultCode']
+        , DurationMs = records.['DurationMs']
+        , ClientCity = records.['ClientCity']
+        , ClientCountryOrRegion = records.['ClientCountryOrRegion']
+| where Type == "AppRequests"
+| project todatetime(dateLog), tostring(Type) ,tostring(ResultCode), todouble(DurationMs), toboolean(Success), ClientCity, ClientCountryOrRegion
+}
+```
 ## Lab 3 Visualisation & Copilot ##
 ![image](./Fab%20summer%20party%20background.png)
 
