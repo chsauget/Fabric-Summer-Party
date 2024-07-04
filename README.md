@@ -1,5 +1,61 @@
 # Fabric-Summer-Party
 
+## Lab 1 - Ingestion ##
+
+### Base de données nopcommerce ###
+
+- Serveur : nopcommerceoltpserv.database.windows.net
+- Base : nopcommerceoltp
+- Authentification : Compte professionnel
+- Tables : Customer, Order, OrderItem, Product
+
+### Fichier Excel hébergé sur SharePoint ###
+
+<https://sauget.sharepoint.com/sites/AmazingZone/Shared%20Documents/Finance/Budget.xlsx>
+
+### Code M de la table Budget ### 
+
+```
+let
+  Source = Excel.Workbook(Web.Contents("https://sauget.sharepoint.com/sites/AmazingZone/Shared%20Documents/Finance/Budget.xlsx"), null, true),
+  #"Navigation 1" = Source{[Item = "Budget", Kind = "Sheet"]}[Data],
+  #"Type de colonne changé" = Table.TransformColumnTypes(#"Navigation 1", {{"Column1", type text}}, "fr"),
+  #"Premières lignes supprimées" = Table.Skip(#"Type de colonne changé", 2),
+  #"En-têtes promus" = Table.PromoteHeaders(#"Premières lignes supprimées", [PromoteAllScalars = true]),
+  #"Autres colonnes supprimées du tableau croisé dynamique" = Table.UnpivotOtherColumns(#"En-têtes promus", {"Country"}, "Attribut", "Valeur"),
+  #"Valeur remplacée" = Table.ReplaceValue(#"Autres colonnes supprimées du tableau croisé dynamique", "NULL", null, Replacer.ReplaceValue, {"Valeur"}),
+  #"Type de colonne changé 1" = Table.TransformColumnTypes(#"Valeur remplacée", {{"Attribut", type date}, {"Valeur", Currency.Type}}, "en-US"),
+  #"Colonnes renommées" = Table.RenameColumns(#"Type de colonne changé 1", {{"Attribut", "Period"}, {"Valeur", "BudgetAmount"}})
+in
+  #"Colonnes renommées"
+```
+
+### Code M de la dimension Date : ###
+
+```
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMjDUByIjAwMDpdhYAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [StartDate = _t]),
+    #"Added Custom" = Table.AddColumn(Source, "EndDate", each Date.From(DateTime.LocalNow())),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom",{{"EndDate", type date}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Changed Type2",{{"StartDate", type date}}),
+    #"Added Custom1" = Table.AddColumn(#"Changed Type", "Dates", each {Number.From([StartDate])..Number.From([EndDate])}),
+    #"Expanded Dates" = Table.ExpandListColumn(#"Added Custom1", "Dates"),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Expanded Dates",{{"Dates", type date}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type1",{"StartDate", "EndDate"}),
+    #"Added Year" = Table.AddColumn(#"Removed Columns1", "Year", each Date.Year([Dates])),
+    #"Added Month" = Table.AddColumn(#"Added Year", "Month", each Date.Month([Dates])),
+    #"Added MonthName" = Table.AddColumn(#"Added Month", "MonthName", each Date.MonthName([Dates])),
+    #"Added ShortMonthName" = Table.AddColumn(#"Added MonthName", "ShortMonthName", each Text.Start([MonthName],3)),
+    #"Added Quarter" = Table.AddColumn(#"Added ShortMonthName", "Quarter", each Date.QuarterOfYear([Dates])),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Quarter",{{"Quarter", type text}}),
+    #"Added QtrText" = Table.AddColumn(#"Changed Type3", "QtrText", each "Qtr "& [Quarter]),
+    #"Added Custom Column" = Table.AddColumn(#"Added QtrText", "DateId", each Text.Combine({Date.ToText([Dates], "yyyy"), "0", Date.ToText([Dates], "%M"), Date.ToText([Dates], "dd")}), type text),
+    #"Type de colonne changé" = Table.TransformColumnTypes(#"Added Custom Column", {{"Year", Int64.Type}, {"Month", Int64.Type}, {"MonthName", type text}, {"ShortMonthName", type text}, {"Quarter", Int64.Type}, {"QtrText", type text}})
+in
+    #"Type de colonne changé"
+```
+
+
 ## Lab 2 - Transformation et modélisation ##
 
 ### Création des tables DimClient et  DimProduit ###
